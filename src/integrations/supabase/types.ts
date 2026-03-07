@@ -14,7 +14,255 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      hashtag_metrics: {
+        Row: {
+          hashtag_id: string
+          id: string
+          recorded_at: string
+          video_count: number | null
+          view_count: number | null
+        }
+        Insert: {
+          hashtag_id: string
+          id?: string
+          recorded_at?: string
+          video_count?: number | null
+          view_count?: number | null
+        }
+        Update: {
+          hashtag_id?: string
+          id?: string
+          recorded_at?: string
+          video_count?: number | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hashtag_metrics_hashtag_id_fkey"
+            columns: ["hashtag_id"]
+            isOneToOne: false
+            referencedRelation: "hashtags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hashtags: {
+        Row: {
+          created_at: string
+          current_video_count: number | null
+          current_view_count: number | null
+          first_seen_at: string
+          id: string
+          is_tracked: boolean | null
+          tag: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_video_count?: number | null
+          current_view_count?: number | null
+          first_seen_at?: string
+          id?: string
+          is_tracked?: boolean | null
+          tag: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_video_count?: number | null
+          current_view_count?: number | null
+          first_seen_at?: string
+          id?: string
+          is_tracked?: boolean | null
+          tag?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      product_hashtags: {
+        Row: {
+          hashtag_id: string
+          id: string
+          product_id: string
+        }
+        Insert: {
+          hashtag_id: string
+          id?: string
+          product_id: string
+        }
+        Update: {
+          hashtag_id?: string
+          id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_hashtags_hashtag_id_fkey"
+            columns: ["hashtag_id"]
+            isOneToOne: false
+            referencedRelation: "hashtags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_hashtags_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "tracked_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_mention_metrics: {
+        Row: {
+          avg_engagement: number | null
+          id: string
+          mention_count: number | null
+          new_videos_count: number | null
+          product_id: string
+          recorded_at: string
+          total_comments: number | null
+          total_likes: number | null
+          total_views: number | null
+        }
+        Insert: {
+          avg_engagement?: number | null
+          id?: string
+          mention_count?: number | null
+          new_videos_count?: number | null
+          product_id: string
+          recorded_at?: string
+          total_comments?: number | null
+          total_likes?: number | null
+          total_views?: number | null
+        }
+        Update: {
+          avg_engagement?: number | null
+          id?: string
+          mention_count?: number | null
+          new_videos_count?: number | null
+          product_id?: string
+          recorded_at?: string
+          total_comments?: number | null
+          total_likes?: number | null
+          total_views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_mention_metrics_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "tracked_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tiktok_videos: {
+        Row: {
+          author_username: string | null
+          collected_at: string
+          comment_count: number | null
+          description: string | null
+          id: string
+          like_count: number | null
+          product_id: string | null
+          published_at: string | null
+          share_count: number | null
+          thumbnail_url: string | null
+          video_id: string
+          video_url: string | null
+          view_count: number | null
+        }
+        Insert: {
+          author_username?: string | null
+          collected_at?: string
+          comment_count?: number | null
+          description?: string | null
+          id?: string
+          like_count?: number | null
+          product_id?: string | null
+          published_at?: string | null
+          share_count?: number | null
+          thumbnail_url?: string | null
+          video_id: string
+          video_url?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          author_username?: string | null
+          collected_at?: string
+          comment_count?: number | null
+          description?: string | null
+          id?: string
+          like_count?: number | null
+          product_id?: string | null
+          published_at?: string | null
+          share_count?: number | null
+          thumbnail_url?: string | null
+          video_id?: string
+          video_url?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tiktok_videos_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "tracked_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tracked_products: {
+        Row: {
+          avg_engagement: number | null
+          category: string | null
+          created_at: string
+          first_detected_at: string
+          growth_percentage: number | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          total_mentions: number | null
+          total_views: number | null
+          trend_level: string | null
+          trend_score: number | null
+          updated_at: string
+        }
+        Insert: {
+          avg_engagement?: number | null
+          category?: string | null
+          created_at?: string
+          first_detected_at?: string
+          growth_percentage?: number | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          total_mentions?: number | null
+          total_views?: number | null
+          trend_level?: string | null
+          trend_score?: number | null
+          updated_at?: string
+        }
+        Update: {
+          avg_engagement?: number | null
+          category?: string | null
+          created_at?: string
+          first_detected_at?: string
+          growth_percentage?: number | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          total_mentions?: number | null
+          total_views?: number | null
+          trend_level?: string | null
+          trend_score?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
