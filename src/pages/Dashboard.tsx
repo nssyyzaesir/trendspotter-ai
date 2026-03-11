@@ -58,6 +58,22 @@ const Dashboard = () => {
     }
   };
 
+  const handleIdentify = async () => {
+    setIsIdentifying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("identify-products");
+      if (error) throw error;
+      toast.success(
+        `Identificação concluída! ${data.summary.products_total} produtos detectados (${data.summary.keyword_matched} por palavras-chave, ${data.summary.ai_identified} por IA, ${data.summary.clusters_found} clusters). ${data.summary.videos_linked} vídeos vinculados.`
+      );
+      queryClient.invalidateQueries({ queryKey: ["trend-products"] });
+    } catch (err: any) {
+      toast.error("Erro na identificação: " + (err.message || "Erro desconhecido"));
+    } finally {
+      setIsIdentifying(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
