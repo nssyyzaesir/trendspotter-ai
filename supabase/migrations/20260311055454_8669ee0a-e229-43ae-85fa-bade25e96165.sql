@@ -1,0 +1,1 @@
+CREATE POLICY "Service role update videos" ON public.tiktok_videos FOR UPDATE USING (true);
