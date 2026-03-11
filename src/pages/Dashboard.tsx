@@ -110,7 +110,17 @@ const Dashboard = () => {
             </div>
             <span className="font-display text-xl font-bold">TrendPulse</span>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCalculate}
+              disabled={isCalculating}
+              className="gap-2"
+            >
+              <Calculator className={`h-4 w-4 ${isCalculating ? "animate-pulse" : ""}`} />
+              {isCalculating ? "Calculando..." : "Calcular Scores"}
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -119,7 +129,7 @@ const Dashboard = () => {
               className="gap-2"
             >
               <ScanSearch className={`h-4 w-4 ${isIdentifying ? "animate-pulse" : ""}`} />
-              {isIdentifying ? "Identificando..." : "Identificar Produtos"}
+              {isIdentifying ? "Identificando..." : "Identificar"}
             </Button>
             <Button
               variant="outline"
@@ -129,10 +139,15 @@ const Dashboard = () => {
               className="gap-2"
             >
               <RefreshCw className={`h-4 w-4 ${isCollecting ? "animate-spin" : ""}`} />
-              {isCollecting ? "Coletando..." : "Coletar Dados"}
+              {isCollecting ? "Coletando..." : "Coletar"}
             </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground">
-              Minha Conta
+            {role === "admin" && (
+              <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="text-muted-foreground">
+                Admin
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-1 text-muted-foreground">
+              <LogOut className="h-4 w-4" /> Sair
             </Button>
           </div>
         </div>
