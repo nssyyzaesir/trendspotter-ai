@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal, TrendingUp, BarChart3, Flame, Package, RefreshCw, Hash, ScanSearch } from "lucide-react";
+import { Search, SlidersHorizontal, TrendingUp, BarChart3, Flame, Package, RefreshCw, Hash, ScanSearch, Calculator, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import TrendCard from "@/components/TrendCard";
 import { mockProducts } from "@/data/mockProducts";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTrendProducts, useHashtags, dbProductToTrendCard } from "@/hooks/useTrendProducts";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const categories = ["Todos", "Tecnologia", "Beleza", "Casa & Decoração", "Fitness", "Conteúdo"];
 const filters = ["Em Alta", "Crescendo", "Novos"];
