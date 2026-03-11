@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.identify-products]
 verify_jwt = false
+
+[functions.calculate-trends]
+verify_jwt = false

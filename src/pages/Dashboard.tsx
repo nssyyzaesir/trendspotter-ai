@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal, TrendingUp, BarChart3, Flame, Package, RefreshCw, Hash, ScanSearch } from "lucide-react";
+import { Search, SlidersHorizontal, TrendingUp, BarChart3, Flame, Package, RefreshCw, Hash, ScanSearch, Calculator, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import TrendCard from "@/components/TrendCard";
 import { mockProducts } from "@/data/mockProducts";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTrendProducts, useHashtags, dbProductToTrendCard } from "@/hooks/useTrendProducts";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const categories = ["Todos", "Tecnologia", "Beleza", "Casa & Decoração", "Fitness", "Conteúdo"];
 const filters = ["Em Alta", "Crescendo", "Novos"];
@@ -19,7 +20,10 @@ const Dashboard = () => {
   const [search, setSearch] = useState("");
   const [isCollecting, setIsCollecting] = useState(false);
   const [isIdentifying, setIsIdentifying] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
   const queryClient = useQueryClient();
+  const { role, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const { data: dbProducts, isLoading: productsLoading } = useTrendProducts();
   const { data: hashtags } = useHashtags();
@@ -74,6 +78,27 @@ const Dashboard = () => {
     }
   };
 
+  const handleCalculate = async () => {
+    setIsCalculating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("calculate-trends");
+      if (error) throw error;
+      toast.success(
+        `Cálculo concluído! ${data.summary.products_updated} produtos atualizados: ${data.summary.hot_products} hot, ${data.summary.rising_products} rising, ${data.summary.saturated_products} saturados.`
+      );
+      queryClient.invalidateQueries({ queryKey: ["trend-products"] });
+    } catch (err: any) {
+      toast.error("Erro no cálculo: " + (err.message || "Erro desconhecido"));
+    } finally {
+      setIsCalculating(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -85,7 +110,17 @@ const Dashboard = () => {
             </div>
             <span className="font-display text-xl font-bold">TrendPulse</span>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCalculate}
+              disabled={isCalculating}
+              className="gap-2"
+            >
+              <Calculator className={`h-4 w-4 ${isCalculating ? "animate-pulse" : ""}`} />
+              {isCalculating ? "Calculando..." : "Calcular Scores"}
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -94,7 +129,7 @@ const Dashboard = () => {
               className="gap-2"
             >
               <ScanSearch className={`h-4 w-4 ${isIdentifying ? "animate-pulse" : ""}`} />
-              {isIdentifying ? "Identificando..." : "Identificar Produtos"}
+              {isIdentifying ? "Identificando..." : "Identificar"}
             </Button>
             <Button
               variant="outline"
@@ -104,10 +139,15 @@ const Dashboard = () => {
               className="gap-2"
             >
               <RefreshCw className={`h-4 w-4 ${isCollecting ? "animate-spin" : ""}`} />
-              {isCollecting ? "Coletando..." : "Coletar Dados"}
+              {isCollecting ? "Coletando..." : "Coletar"}
             </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground">
-              Minha Conta
+            {role === "admin" && (
+              <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="text-muted-foreground">
+                Admin
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-1 text-muted-foreground">
+              <LogOut className="h-4 w-4" /> Sair
             </Button>
           </div>
         </div>
