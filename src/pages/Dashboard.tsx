@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [search, setSearch] = useState("");
   const [isCollecting, setIsCollecting] = useState(false);
+  const [isIdentifying, setIsIdentifying] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: dbProducts, isLoading: productsLoading } = useTrendProducts();
