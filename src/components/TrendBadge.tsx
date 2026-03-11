@@ -1,7 +1,7 @@
-import { Flame, TrendingUp, Zap } from "lucide-react";
+import { Flame, TrendingUp, Zap, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type TrendLevel = "hot" | "rising" | "new";
+type TrendLevel = "hot" | "rising" | "new" | "saturated";
 
 const config: Record<TrendLevel, { label: string; icon: typeof Flame; className: string }> = {
   hot: {
@@ -19,6 +19,11 @@ const config: Record<TrendLevel, { label: string; icon: typeof Flame; className:
     icon: Zap,
     className: "bg-primary/15 text-primary border-primary/20",
   },
+  saturated: {
+    label: "Saturado",
+    icon: AlertTriangle,
+    className: "bg-muted text-muted-foreground border-border",
+  },
 };
 
 interface TrendBadgeProps {
@@ -26,7 +31,8 @@ interface TrendBadgeProps {
 }
 
 const TrendBadge = ({ level }: TrendBadgeProps) => {
-  const { label, icon: Icon, className } = config[level];
+  const entry = config[level] || config.new;
+  const { label, icon: Icon, className } = entry;
 
   return (
     <span className={cn("inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium", className)}>
