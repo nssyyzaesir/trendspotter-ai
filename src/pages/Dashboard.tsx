@@ -89,6 +89,16 @@ const Dashboard = () => {
             <Button
               variant="outline"
               size="sm"
+              onClick={handleIdentify}
+              disabled={isIdentifying}
+              className="gap-2"
+            >
+              <ScanSearch className={`h-4 w-4 ${isIdentifying ? "animate-pulse" : ""}`} />
+              {isIdentifying ? "Identificando..." : "Identificar Produtos"}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleCollect}
               disabled={isCollecting}
               className="gap-2"
