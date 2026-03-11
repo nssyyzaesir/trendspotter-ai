@@ -78,6 +78,27 @@ const Dashboard = () => {
     }
   };
 
+  const handleCalculate = async () => {
+    setIsCalculating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("calculate-trends");
+      if (error) throw error;
+      toast.success(
+        `Cálculo concluído! ${data.summary.products_updated} produtos atualizados: ${data.summary.hot_products} hot, ${data.summary.rising_products} rising, ${data.summary.saturated_products} saturados.`
+      );
+      queryClient.invalidateQueries({ queryKey: ["trend-products"] });
+    } catch (err: any) {
+      toast.error("Erro no cálculo: " + (err.message || "Erro desconhecido"));
+    } finally {
+      setIsCalculating(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
