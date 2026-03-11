@@ -2,3 +2,6 @@ project_id = "xvwstvonusnlblysiqxz"
 
 [functions.collect-trends]
 verify_jwt = false
+
+[functions.identify-products]
+verify_jwt = false

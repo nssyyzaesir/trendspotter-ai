@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal, TrendingUp, BarChart3, Flame, Package, RefreshCw, Hash } from "lucide-react";
+import { Search, SlidersHorizontal, TrendingUp, BarChart3, Flame, Package, RefreshCw, Hash, ScanSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import TrendCard from "@/components/TrendCard";
@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [search, setSearch] = useState("");
   const [isCollecting, setIsCollecting] = useState(false);
+  const [isIdentifying, setIsIdentifying] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: dbProducts, isLoading: productsLoading } = useTrendProducts();
@@ -57,6 +58,22 @@ const Dashboard = () => {
     }
   };
 
+  const handleIdentify = async () => {
+    setIsIdentifying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("identify-products");
+      if (error) throw error;
+      toast.success(
+        `Identificação concluída! ${data.summary.products_total} produtos detectados (${data.summary.keyword_matched} por palavras-chave, ${data.summary.ai_identified} por IA, ${data.summary.clusters_found} clusters). ${data.summary.videos_linked} vídeos vinculados.`
+      );
+      queryClient.invalidateQueries({ queryKey: ["trend-products"] });
+    } catch (err: any) {
+      toast.error("Erro na identificação: " + (err.message || "Erro desconhecido"));
+    } finally {
+      setIsIdentifying(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -69,6 +86,16 @@ const Dashboard = () => {
             <span className="font-display text-xl font-bold">TrendPulse</span>
           </Link>
           <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleIdentify}
+              disabled={isIdentifying}
+              className="gap-2"
+            >
+              <ScanSearch className={`h-4 w-4 ${isIdentifying ? "animate-pulse" : ""}`} />
+              {isIdentifying ? "Identificando..." : "Identificar Produtos"}
+            </Button>
             <Button
               variant="outline"
               size="sm"
