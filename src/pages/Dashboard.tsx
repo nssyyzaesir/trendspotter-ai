@@ -20,7 +20,10 @@ const Dashboard = () => {
   const [search, setSearch] = useState("");
   const [isCollecting, setIsCollecting] = useState(false);
   const [isIdentifying, setIsIdentifying] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
   const queryClient = useQueryClient();
+  const { role, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const { data: dbProducts, isLoading: productsLoading } = useTrendProducts();
   const { data: hashtags } = useHashtags();
