@@ -45,6 +45,28 @@ const AdminUsersTab = () => {
 
   useEffect(() => { fetchUsers(); }, []);
 
+  const handleCreateAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-manage-users", {
+        body: { action: "create_admin", email: newEmail, password: newPassword, fullName: newName },
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      toast.success(data.message);
+      setNewEmail("");
+      setNewPassword("");
+      setNewName("");
+      setShowCreateForm(false);
+      fetchUsers();
+    } catch (err: any) {
+      toast.error("Erro: " + err.message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const handleAction = async (action: string, userId: string, extra?: Record<string, string>) => {
     const confirmMessages: Record<string, string> = {
       ban_user: "Deseja realmente banir este usuário?",
