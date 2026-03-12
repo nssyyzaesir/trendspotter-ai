@@ -125,6 +125,38 @@ const AdminUsersTab = () => {
         </div>
       </div>
 
+      {/* Create Admin Button + Form */}
+      <div className="mb-4">
+        <Button size="sm" onClick={() => setShowCreateForm(!showCreateForm)} className="gap-2">
+          <UserPlus className="h-4 w-4" />
+          {showCreateForm ? "Cancelar" : "Criar Conta Admin"}
+        </Button>
+
+        {showCreateForm && (
+          <form onSubmit={handleCreateAdmin} className="mt-3 rounded-xl border border-border bg-card p-4">
+            <h4 className="mb-3 font-display font-bold">Nova Conta Administradora</h4>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div>
+                <Label className="text-xs">Nome</Label>
+                <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nome completo" className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Email</Label>
+                <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="email@exemplo.com" required className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Senha</Label>
+                <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Mín. 6 caracteres" minLength={6} required className="mt-1" />
+              </div>
+            </div>
+            <Button type="submit" size="sm" disabled={creating} className="mt-3 gap-2">
+              <UserPlus className="h-4 w-4" />
+              {creating ? "Criando..." : "Criar Admin"}
+            </Button>
+          </form>
+        )}
+      </div>
+
       {/* Search */}
       <div className="relative mb-4 max-w-sm">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
