@@ -104,6 +104,25 @@ serve(async (req) => {
         });
       }
 
+      case "create_admin": {
+        const { email, password, fullName } = await req.json().catch(() => ({}));
+        if (!email || !password) throw new Error("email e password são obrigatórios");
+
+        const { data: newUser, error: createErr } = await supabaseAdmin.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: { full_name: fullName || "Admin" },
+        });
+        if (createErr) throw createErr;
+
+        await supabaseAdmin.from("user_roles").update({ role: "admin" }).eq("user_id", newUser.user.id);
+
+        return new Response(JSON.stringify({ success: true, message: `Admin ${email} criado com sucesso!` }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
       case "delete_user": {
         if (!userId) throw new Error("userId é obrigatório");
         if (userId === caller.id) throw new Error("Você não pode deletar sua própria conta");
