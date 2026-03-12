@@ -30,7 +30,8 @@ serve(async (req) => {
     });
     if (!callerRole) throw new Error("Acesso negado: apenas administradores");
 
-    const { action, userId, role, reason } = await req.json();
+    const body = await req.json();
+    const { action, userId, role, reason, email: newEmail, password: newPassword, fullName } = body;
 
     switch (action) {
       case "list_users": {
