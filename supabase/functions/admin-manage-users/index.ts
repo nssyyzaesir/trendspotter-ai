@@ -30,7 +30,8 @@ serve(async (req) => {
     });
     if (!callerRole) throw new Error("Acesso negado: apenas administradores");
 
-    const { action, userId, role, reason } = await req.json();
+    const body = await req.json();
+    const { action, userId, role, reason, email: newEmail, password: newPassword, fullName } = body;
 
     switch (action) {
       case "list_users": {
@@ -100,6 +101,24 @@ serve(async (req) => {
         await supabaseAdmin.auth.admin.updateUserById(userId, { ban_duration: "none" });
 
         return new Response(JSON.stringify({ success: true, message: "Usuário desbanido" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      case "create_admin": {
+        if (!newEmail || !newPassword) throw new Error("email e password são obrigatórios");
+
+        const { data: newUser, error: createErr } = await supabaseAdmin.auth.admin.createUser({
+          email: newEmail,
+          password: newPassword,
+          email_confirm: true,
+          user_metadata: { full_name: fullName || "Admin" },
+        });
+        if (createErr) throw createErr;
+
+        await supabaseAdmin.from("user_roles").update({ role: "admin" }).eq("user_id", newUser.user.id);
+
+        return new Response(JSON.stringify({ success: true, message: `Admin ${newEmail} criado com sucesso!` }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }

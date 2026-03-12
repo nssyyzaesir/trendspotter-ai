@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Users, Shield, ShieldOff, Ban, Unlock, Trash2, Search, UserCheck, UserX } from "lucide-react";
+import { Users, Shield, ShieldOff, Ban, Unlock, Trash2, Search, UserCheck, UserX, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -20,6 +21,11 @@ const AdminUsersTab = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [newName, setNewName] = useState("");
+  const [creating, setCreating] = useState(false);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -38,6 +44,28 @@ const AdminUsersTab = () => {
   };
 
   useEffect(() => { fetchUsers(); }, []);
+
+  const handleCreateAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-manage-users", {
+        body: { action: "create_admin", email: newEmail, password: newPassword, fullName: newName },
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      toast.success(data.message);
+      setNewEmail("");
+      setNewPassword("");
+      setNewName("");
+      setShowCreateForm(false);
+      fetchUsers();
+    } catch (err: any) {
+      toast.error("Erro: " + err.message);
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const handleAction = async (action: string, userId: string, extra?: Record<string, string>) => {
     const confirmMessages: Record<string, string> = {
@@ -95,6 +123,38 @@ const AdminUsersTab = () => {
           <p className="font-display text-xl font-bold text-destructive">{bannedCount}</p>
           <p className="text-xs text-muted-foreground">Banidos</p>
         </div>
+      </div>
+
+      {/* Create Admin Button + Form */}
+      <div className="mb-4">
+        <Button size="sm" onClick={() => setShowCreateForm(!showCreateForm)} className="gap-2">
+          <UserPlus className="h-4 w-4" />
+          {showCreateForm ? "Cancelar" : "Criar Conta Admin"}
+        </Button>
+
+        {showCreateForm && (
+          <form onSubmit={handleCreateAdmin} className="mt-3 rounded-xl border border-border bg-card p-4">
+            <h4 className="mb-3 font-display font-bold">Nova Conta Administradora</h4>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div>
+                <Label className="text-xs">Nome</Label>
+                <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nome completo" className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Email</Label>
+                <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="email@exemplo.com" required className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Senha</Label>
+                <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Mín. 6 caracteres" minLength={6} required className="mt-1" />
+              </div>
+            </div>
+            <Button type="submit" size="sm" disabled={creating} className="mt-3 gap-2">
+              <UserPlus className="h-4 w-4" />
+              {creating ? "Criando..." : "Criar Admin"}
+            </Button>
+          </form>
+        )}
       </div>
 
       {/* Search */}
