@@ -109,8 +109,8 @@ serve(async (req) => {
         if (!newEmail || !newPassword) throw new Error("email e password são obrigatórios");
 
         const { data: newUser, error: createErr } = await supabaseAdmin.auth.admin.createUser({
-          email,
-          password,
+          email: newEmail,
+          password: newPassword,
           email_confirm: true,
           user_metadata: { full_name: fullName || "Admin" },
         });
