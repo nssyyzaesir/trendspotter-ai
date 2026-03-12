@@ -118,7 +118,7 @@ serve(async (req) => {
 
         await supabaseAdmin.from("user_roles").update({ role: "admin" }).eq("user_id", newUser.user.id);
 
-        return new Response(JSON.stringify({ success: true, message: `Admin ${email} criado com sucesso!` }), {
+        return new Response(JSON.stringify({ success: true, message: `Admin ${newEmail} criado com sucesso!` }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
