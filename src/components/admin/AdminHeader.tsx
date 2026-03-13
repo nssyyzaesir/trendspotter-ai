@@ -2,6 +2,7 @@ import { TrendingUp, Eye, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const AdminHeader = () => {
   const { signOut } = useAuth();
@@ -25,6 +26,7 @@ const AdminHeader = () => {
           </span>
         </Link>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-1 text-muted-foreground">
             <Eye className="h-4 w-4" /> Ver Dashboard
           </Button>

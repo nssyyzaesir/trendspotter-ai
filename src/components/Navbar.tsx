@@ -2,6 +2,7 @@ import { TrendingUp, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -29,15 +30,23 @@ const Navbar = () => {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Button variant="ghost" size="sm">Entrar</Button>
-          <Button size="sm" className="bg-gradient-primary text-primary-foreground hover:opacity-90">
-            Começar Grátis
-          </Button>
+          <ThemeToggle />
+          <Link to="/auth">
+            <Button variant="ghost" size="sm">Entrar</Button>
+          </Link>
+          <Link to="/auth">
+            <Button size="sm" className="bg-gradient-primary text-primary-foreground hover:opacity-90">
+              Começar Grátis
+            </Button>
+          </Link>
         </div>
 
-        <button className="md:hidden" onClick={() => setOpen(!open)}>
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <button onClick={() => setOpen(!open)}>
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {open && (
@@ -46,7 +55,9 @@ const Navbar = () => {
             <a href="#features" className="text-sm text-muted-foreground">Recursos</a>
             <a href="#how-it-works" className="text-sm text-muted-foreground">Como Funciona</a>
             <a href="#pricing" className="text-sm text-muted-foreground">Preços</a>
-            <Button size="sm" className="bg-gradient-primary text-primary-foreground">Começar Grátis</Button>
+            <Link to="/auth">
+              <Button size="sm" className="w-full bg-gradient-primary text-primary-foreground">Começar Grátis</Button>
+            </Link>
           </div>
         </div>
       )}
