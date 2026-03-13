@@ -36,7 +36,7 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <section id="features" className="py-24">
+    <section id="features" className="relative py-24 bg-muted/30">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -44,12 +44,15 @@ const FeaturesSection = () => {
           viewport={{ once: true }}
           className="mb-16 text-center"
         >
-          <h2 className="mb-4 font-display text-3xl font-bold sm:text-4xl">
+          <div className="mb-4 inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+            Recursos da Plataforma
+          </div>
+          <h2 className="mb-4 font-display text-4xl font-bold tracking-tight sm:text-5xl">
             Tudo que você precisa para{" "}
-            <span className="text-gradient">encontrar oportunidades</span>
+            <span className="text-gradient block sm:inline">encontrar oportunidades</span>
           </h2>
-          <p className="mx-auto max-w-2xl text-muted-foreground">
-            Ferramentas inteligentes para identificar produtos com potencial de viralização no TikTok.
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+            Uma suíte completa de inteligência de mercado projetada para quem quer sair na frente e dominar as vendas no TikTok.
           </p>
         </motion.div>
 
@@ -61,13 +64,16 @@ const FeaturesSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group rounded-xl border border-border bg-card p-6 shadow-card transition-all duration-300 hover:shadow-card-hover"
+              className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
             >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-primary">
-                <feature.icon className="h-5 w-5 text-primary-foreground" />
+              {/* Subtle background glow effect on hover */}
+              <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-primary/5 opacity-0 blur-2xl transition-opacity group-hover:opacity-100" />
+              
+              <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                <feature.icon className="h-6 w-6" />
               </div>
-              <h3 className="mb-2 font-display text-lg font-semibold">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground">{feature.description}</p>
+              <h3 className="mb-3 font-display text-xl font-bold">{feature.title}</h3>
+              <p className="text-base text-muted-foreground leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}
         </div>

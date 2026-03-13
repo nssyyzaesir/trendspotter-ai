@@ -12,6 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import ThemeToggle from "@/components/ThemeToggle";
+import MainLayout from "@/components/layout/MainLayout";
 
 const categories = ["Todos", "Tecnologia", "Beleza", "Casa & Decoração", "Fitness", "Conteúdo"];
 const filters = ["Em Alta", "Crescendo", "Novos"];
@@ -68,133 +69,128 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
-              <TrendingUp className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="font-display text-xl font-bold">TrendPulse</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => handleAction("collect-trends", setIsCollecting)} disabled={isCollecting} className="gap-1.5">
-              <RefreshCw className={`h-3.5 w-3.5 ${isCollecting ? "animate-spin" : ""}`} />
-              <span className="hidden sm:inline">{isCollecting ? "Coletando..." : "Coletar"}</span>
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => handleAction("identify-products", setIsIdentifying)} disabled={isIdentifying} className="gap-1.5">
-              <ScanSearch className={`h-3.5 w-3.5 ${isIdentifying ? "animate-pulse" : ""}`} />
-              <span className="hidden sm:inline">{isIdentifying ? "Identificando..." : "Identificar"}</span>
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => handleAction("calculate-trends", setIsCalculating)} disabled={isCalculating} className="gap-1.5">
-              <Calculator className={`h-3.5 w-3.5 ${isCalculating ? "animate-pulse" : ""}`} />
-              <span className="hidden sm:inline">{isCalculating ? "Calculando..." : "Calcular"}</span>
-            </Button>
-            <ThemeToggle />
-            {role === "admin" && (
-              <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="text-muted-foreground">
-                Admin
-              </Button>
-            )}
-            <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-1 text-muted-foreground">
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
+    <MainLayout>
+      {/* Stats Header Area */}
+      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-bold tracking-tight">Dashboard Overview</h1>
+          <p className="text-muted-foreground mt-1">
+            Aqui está o panorama das tendências virais do TikTok hoje.
+          </p>
         </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        {/* Stats */}
-        <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {stats.map((stat, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="rounded-xl border border-border bg-card p-5 shadow-card"
-            >
-              <stat.icon className={`mb-2 h-5 w-5 ${stat.color}`} />
-              <p className="font-display text-2xl font-bold">{stat.value}</p>
-              <p className="text-xs text-muted-foreground">{stat.label}</p>
-            </motion.div>
-          ))}
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => handleAction("collect-trends", setIsCollecting)} disabled={isCollecting} className="gap-2 bg-background shadow-sm hover:shadow-md transition-all">
+            <RefreshCw className={`h-4 w-4 ${isCollecting ? "animate-spin text-primary" : "text-muted-foreground"}`} />
+            <span className="hidden sm:inline">{isCollecting ? "Coletando..." : "Sincronizar"}</span>
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => handleAction("identify-products", setIsIdentifying)} disabled={isIdentifying} className="gap-2 bg-background shadow-sm hover:shadow-md transition-all">
+            <ScanSearch className={`h-4 w-4 ${isIdentifying ? "animate-pulse text-primary" : "text-muted-foreground"}`} />
+            <span className="hidden sm:inline">{isIdentifying ? "Identificando..." : "Descobrir"}</span>
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => handleAction("calculate-trends", setIsCalculating)} disabled={isCalculating} className="gap-2 bg-background shadow-sm hover:shadow-md transition-all">
+            <Calculator className={`h-4 w-4 ${isCalculating ? "animate-pulse text-primary" : "text-muted-foreground"}`} />
+            <span className="hidden sm:inline">{isCalculating ? "Calculando..." : "Analisar"}</span>
+          </Button>
         </div>
+      </div>
 
-        {/* Hashtags */}
-        {hashtags && hashtags.length > 0 && (
-          <div className="mb-8">
-            <h2 className="mb-3 flex items-center gap-2 font-display text-lg font-bold">
-              <Hash className="h-5 w-5 text-accent" />
-              Hashtags em Alta
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {hashtags.map((ht: any) => (
-                <div
-                  key={ht.id}
-                  className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-sm transition-colors hover:border-accent"
-                >
-                  <span className="font-medium">{ht.tag}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {ht.current_view_count ? `${(ht.current_view_count / 1000000).toFixed(1)}M views` : ""}
-                  </span>
-                </div>
-              ))}
+      {/* Stats Cards */}
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+          >
+            <div className={`absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-10 blur-2xl ${stat.color.replace('text-', 'bg-')}`} />
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm font-medium text-muted-foreground">{stat.label}</span>
+              <div className={`flex h-8 w-8 items-center justify-center rounded-lg bg-muted/50 ${stat.color}`}>
+                <stat.icon className="h-4 w-4" />
+              </div>
             </div>
-          </div>
-        )}
+            <div className="flex items-baseline gap-2">
+              <h2 className="font-display text-3xl font-bold tracking-tight">{stat.value}</h2>
+            </div>
+          </motion.div>
+        ))}
+      </div>
 
-        {/* Search & Filters */}
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative max-w-sm flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Buscar produtos..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
-          </div>
-          <div className="flex items-center gap-2">
-            <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-            {filters.map((f) => (
-              <Button key={f} variant="outline" size="sm" className="text-xs">{f}</Button>
+      {/* Hashtags */}
+      {hashtags && hashtags.length > 0 && (
+        <div className="mb-8 animate-fade-in">
+          <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-bold">
+            <Hash className="h-5 w-5 text-accent" />
+            Hashtags em Alta na Semana
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {hashtags.map((ht: any) => (
+              <div
+                key={ht.id}
+                className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
+              >
+                <span className="font-medium">#{ht.tag.replace('#', '')}</span>
+                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  {ht.current_view_count ? `${(ht.current_view_count / 1000000).toFixed(1)}M` : ""}
+                </span>
+              </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Explore Section */}
+      <div className="mb-8 rounded-2xl border border-border bg-card/50 p-4 backdrop-blur-sm sm:p-6">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="font-display text-xl font-bold">Explorar Produtos</h2>
+          <div className="flex items-center gap-2">
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input 
+                placeholder="Buscar em tendências..." 
+                className="h-10 rounded-full border-border bg-background pl-9 focus-visible:ring-primary" 
+                value={search} 
+                onChange={(e) => setSearch(e.target.value)} 
+              />
+            </div>
+            <Button variant="outline" size="icon" className="h-10 w-10 shrink-0 rounded-full">
+              <SlidersHorizontal className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
         {/* Categories */}
-        <div className="mb-8 flex flex-wrap gap-2">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                activeCategory === cat
-                  ? "bg-gradient-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Title */}
-        <div className="mb-6">
-          <h1 className="font-display text-2xl font-bold">Produtos em Tendência</h1>
-          <p className="text-sm text-muted-foreground">
-            {filtered.length} produtos encontrados • {hasDBData ? "Dados reais" : "Dados de demonstração"}
-          </p>
+        <div className="mb-8 flex overflow-x-auto pb-2 scrollbar-none">
+          <div className="flex gap-2">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`flex-none rounded-full px-5 py-2 text-sm font-semibold transition-all ${
+                  activeCategory === cat
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Grid */}
         {productsLoading ? (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-80 animate-pulse rounded-xl bg-muted" />
+              <div key={i} className="h-72 animate-pulse rounded-2xl bg-muted/60" />
             ))}
           </div>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((product, i) => (
-              <motion.div key={product.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+              <motion.div key={product.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05, duration: 0.2 }}>
                 <TrendCard product={product} />
               </motion.div>
             ))}
@@ -202,12 +198,18 @@ const Dashboard = () => {
         )}
 
         {filtered.length === 0 && !productsLoading && (
-          <div className="py-20 text-center text-muted-foreground">
-            Nenhum produto encontrado para essa busca.
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+              <Package className="h-8 w-8 text-muted-foreground/50" />
+            </div>
+            <h3 className="font-display text-lg font-bold">Nenhum produto encontrado</h3>
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+              Tente ajustar seus filtros ou buscar por termos diferentes.
+            </p>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 

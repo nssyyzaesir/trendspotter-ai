@@ -62,38 +62,47 @@ const PricingSection = () => {
   const [period, setPeriod] = useState<"monthly" | "quarterly" | "yearly">("monthly");
 
   return (
-    <section id="pricing" className="py-24 bg-muted/30">
+    <section id="pricing" className="relative py-24 bg-muted/20">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12 text-center"
+          className="mb-16 text-center"
         >
-          <h2 className="mb-4 font-display text-3xl font-bold md:text-4xl">
-            Planos & <span className="text-gradient">Preços</span>
+          <div className="mb-4 inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+            Planos e Preços
+          </div>
+          <h2 className="mb-4 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+            Invista no seu <span className="text-gradient">crescimento</span>
           </h2>
-          <p className="mx-auto max-w-2xl text-muted-foreground">
-            Escolha o plano ideal para o seu negócio e comece a identificar tendências antes da concorrência.
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+            Escolha o plano ideal e comece a identificar produtos virais antes da concorrência, multiplicando suas vendas.
           </p>
         </motion.div>
 
-        {/* Period selector */}
-        <div className="mb-10 flex justify-center">
-          <div className="inline-flex gap-1 rounded-lg bg-muted p-1">
+        {/* Period Selector Toggle */}
+        <div className="mb-12 flex justify-center">
+          <div className="inline-flex items-center rounded-full border border-border/50 bg-card p-1.5 shadow-sm">
             {periods.map((p) => (
               <button
                 key={p.key}
                 onClick={() => setPeriod(p.key)}
-                className={`relative rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                className={`relative flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-300 ${
                   period === p.key
-                    ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
                 }`}
               >
                 {p.label}
                 {p.save && (
-                  <span className="ml-1.5 rounded-full bg-accent/10 px-1.5 py-0.5 text-[10px] font-bold text-accent">
+                  <span
+                    className={`ml-2 rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wider ${
+                      period === p.key
+                        ? "bg-primary-foreground/20 text-primary-foreground"
+                        : "bg-accent/20 text-accent"
+                    }`}
+                  >
                     -{p.save}
                   </span>
                 )}
@@ -102,8 +111,8 @@ const PricingSection = () => {
           </div>
         </div>
 
-        {/* Cards */}
-        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
+        {/* Pricing Cards */}
+        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3 lg:gap-12">
           {plans.map((plan, i) => (
             <motion.div
               key={plan.name}
@@ -111,51 +120,69 @@ const PricingSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className={`relative rounded-2xl border p-6 ${
+              className={`relative flex flex-col overflow-hidden rounded-3xl border ${
                 plan.popular
-                  ? "border-primary bg-card shadow-card-hover"
-                  : "border-border bg-card shadow-card"
+                  ? "border-primary/50 bg-card shadow-xl shadow-primary/10 md:-mt-8 md:mb-8"
+                  : "border-border/50 bg-card shadow-sm mt-0"
               }`}
             >
               {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-primary px-4 py-1 text-xs font-bold text-primary-foreground">
-                  Mais Popular
+                <div className="absolute top-0 flex w-full justify-center bg-gradient-primary py-1.5 text-xs font-bold uppercase tracking-widest text-primary-foreground">
+                  O Mais Escolhido
                 </div>
               )}
-              <plan.icon className={`mb-4 h-8 w-8 ${plan.popular ? "text-primary" : "text-muted-foreground"}`} />
-              <h3 className="font-display text-xl font-bold">{plan.name}</h3>
-              <p className="mb-4 text-sm text-muted-foreground">{plan.description}</p>
+              
+              <div className={`p-8 ${plan.popular ? "pt-12" : ""}`}>
+                <div className="mb-6 flex items-center gap-4">
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${
+                    plan.popular ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                  }`}>
+                    <plan.icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-display text-2xl font-bold">{plan.name}</h3>
+                    <p className="text-sm text-muted-foreground">{plan.description}</p>
+                  </div>
+                </div>
 
-              <div className="mb-6">
-                <span className="font-display text-4xl font-bold">
-                  R${plan.price[period]}
-                </span>
-                <span className="text-sm text-muted-foreground">
-                  /{period === "monthly" ? "mês" : period === "quarterly" ? "tri" : "ano"}
-                </span>
+                <div className="mb-8 flex items-end gap-2">
+                  <span className="font-display text-5xl font-extrabold tracking-tight">
+                    R${plan.price[period]}
+                  </span>
+                  <span className="mb-1 text-sm font-medium text-muted-foreground">
+                    /{period === "monthly" ? "mês" : period === "quarterly" ? "trimestre" : "ano"}
+                  </span>
+                </div>
+
+                <Link to="/auth" className="block w-full">
+                  <Button
+                    size="lg"
+                    className={`w-full rounded-xl h-12 text-base font-semibold ${
+                      plan.popular
+                        ? "bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"
+                        : "bg-muted text-foreground hover:bg-muted/80"
+                    }`}
+                  >
+                    Começar Agora
+                  </Button>
+                </Link>
               </div>
 
-              <Link to="/auth">
-                <Button
-                  className={`mb-6 w-full ${
-                    plan.popular
-                      ? "bg-gradient-primary text-primary-foreground hover:opacity-90"
-                      : ""
-                  }`}
-                  variant={plan.popular ? "default" : "outline"}
-                >
-                  Começar Agora
-                </Button>
-              </Link>
-
-              <ul className="space-y-3">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="flex-1 bg-muted/20 p-8 pt-6 border-t border-border/50">
+                <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">O que está incluído:</p>
+                <ul className="space-y-4">
+                  {plan.features.map((f, idx) => (
+                    <li key={idx} className="flex items-start gap-3 text-sm font-medium">
+                      <div className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                        plan.popular ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                      }`}>
+                        <Check className="h-3 w-3" />
+                      </div>
+                      <span className="leading-tight">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </motion.div>
           ))}
         </div>

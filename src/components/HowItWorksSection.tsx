@@ -20,23 +20,26 @@ const steps = [
 
 const HowItWorksSection = () => {
   return (
-    <section id="how-it-works" className="bg-muted/50 py-24">
+    <section id="how-it-works" className="relative py-24 bg-background">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-16 text-center"
+          className="mb-20 text-center"
         >
-          <h2 className="mb-4 font-display text-3xl font-bold sm:text-4xl">
+          <div className="mb-4 inline-flex items-center rounded-full bg-accent/10 px-3 py-1 text-sm font-semibold text-accent">
+            Simples e Rápido
+          </div>
+          <h2 className="mb-4 font-display text-4xl font-bold tracking-tight sm:text-5xl">
             Como funciona
           </h2>
-          <p className="mx-auto max-w-xl text-muted-foreground">
-            Três passos simples para encontrar seu próximo produto viral.
+          <p className="mx-auto max-w-xl text-lg text-muted-foreground">
+            Três passos simples para encontrar seu próximo produto viral antes que o mercado sature.
           </p>
         </motion.div>
 
-        <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-3">
+        <div className="mx-auto grid max-w-5xl gap-12 md:grid-cols-3">
           {steps.map((step, i) => (
             <motion.div
               key={i}
@@ -44,13 +47,22 @@ const HowItWorksSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.15 }}
-              className="text-center"
+              className="relative text-center md:text-left"
             >
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-primary font-display text-xl font-bold text-primary-foreground">
-                {step.number}
+              {/* Connector Line for Desktop */}
+              {i < steps.length - 1 && (
+                <div className="absolute left-[50%] top-8 hidden w-full -translate-y-1/2 border-t-2 border-dashed border-border/60 md:block lg:left-[60%]" />
+              )}
+              
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary shadow-glow md:mx-0">
+                <span className="font-display text-2xl font-extrabold text-primary-foreground">
+                  {step.number}
+                </span>
               </div>
-              <h3 className="mb-2 font-display text-lg font-semibold">{step.title}</h3>
-              <p className="text-sm text-muted-foreground">{step.description}</p>
+              <h3 className="mb-3 font-display text-xl font-bold">{step.title}</h3>
+              <p className="text-base leading-relaxed text-muted-foreground">
+                {step.description}
+              </p>
             </motion.div>
           ))}
         </div>

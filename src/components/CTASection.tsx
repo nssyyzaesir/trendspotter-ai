@@ -11,26 +11,29 @@ const CTASection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="relative overflow-hidden rounded-2xl bg-hero p-12 text-center sm:p-16"
+          className="relative overflow-hidden rounded-3xl bg-hero p-12 text-center shadow-2xl sm:p-20 border border-primary/20"
         >
           <div className="pointer-events-none absolute inset-0">
-            <div className="absolute left-1/3 top-0 h-64 w-64 rounded-full bg-primary/15 blur-3xl" />
-            <div className="absolute right-1/4 bottom-0 h-48 w-48 rounded-full bg-secondary/15 blur-3xl" />
+            <div className="absolute left-1/3 top-0 h-96 w-96 rounded-full bg-primary/20 blur-[100px]" />
+            <div className="absolute right-1/4 bottom-0 h-72 w-72 rounded-full bg-secondary/20 blur-[80px]" />
           </div>
 
-          <div className="relative">
-            <h2 className="mb-4 font-display text-3xl font-bold text-primary-foreground sm:text-4xl">
-              Comece a encontrar produtos virais hoje
+          <div className="relative z-10">
+            <h2 className="mb-6 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+              Pronto para dominar o <span className="text-gradient">TikTok?</span>
             </h2>
-            <p className="mx-auto mb-8 max-w-xl text-primary-foreground/60">
-              Junte-se a milhares de vendedores que já usam o TrendPulse para descobrir oportunidades antes da concorrência.
+            <p className="mx-auto mb-10 max-w-2xl text-lg text-white/80">
+              Junte-se aos vendedores e marcas que já estão usando inteligência de dados para encontrar seu próximo produto milionário.
             </p>
-            <Link to="/dashboard">
-              <Button size="lg" className="bg-gradient-accent text-accent-foreground hover:opacity-90">
-                Começar Gratuitamente
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link to="/auth">
+                <Button size="lg" className="h-14 bg-gradient-primary px-8 text-base font-bold text-white shadow-glow hover:scale-105 hover:opacity-90 transition-all duration-300">
+                  Criar Conta Grátis
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+            <p className="mt-6 text-sm text-white/50">Não é necessário cartão de crédito. Teste grátis por 7 dias.</p>
           </div>
         </motion.div>
       </div>

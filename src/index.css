@@ -140,4 +140,9 @@
   .font-display {
     font-family: var(--font-display);
   }
+
+  .glass {
+    @apply bg-background/70 backdrop-blur-md border-border/50 shadow-sm;
+  }
 }
+
