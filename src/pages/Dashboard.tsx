@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const categories = ["Todos", "Tecnologia", "Beleza", "Casa & Decoração", "Fitness", "Conteúdo"];
 const filters = ["Em Alta", "Crescendo", "Novos"];
@@ -28,7 +29,6 @@ const Dashboard = () => {
   const { data: dbProducts, isLoading: productsLoading } = useTrendProducts();
   const { data: hashtags } = useHashtags();
 
-  // Use DB data if available, otherwise fall back to mock data
   const hasDBData = dbProducts && dbProducts.length > 0;
   const products = hasDBData
     ? dbProducts.map(dbProductToTrendCard)
@@ -47,50 +47,18 @@ const Dashboard = () => {
     { icon: Package, label: "Novos Detectados", value: hasDBData ? String(dbProducts.filter(p => p.trend_level === 'new').length) : "12", color: "text-secondary" },
   ];
 
-  const handleCollect = async () => {
-    setIsCollecting(true);
+  const handleAction = async (fn: string, setLoading: (v: boolean) => void) => {
+    setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("collect-trends");
+      const { data, error } = await supabase.functions.invoke(fn);
       if (error) throw error;
-      toast.success(`Coleta concluída! ${data.summary.products_processed} produtos, ${data.summary.videos_collected} vídeos, ${data.summary.hashtags_tracked} hashtags`);
+      toast.success(`${fn} concluído!`);
       queryClient.invalidateQueries({ queryKey: ["trend-products"] });
       queryClient.invalidateQueries({ queryKey: ["hashtags"] });
     } catch (err: any) {
-      toast.error("Erro na coleta: " + (err.message || "Erro desconhecido"));
+      toast.error("Erro: " + err.message);
     } finally {
-      setIsCollecting(false);
-    }
-  };
-
-  const handleIdentify = async () => {
-    setIsIdentifying(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("identify-products");
-      if (error) throw error;
-      toast.success(
-        `Identificação concluída! ${data.summary.products_total} produtos detectados (${data.summary.keyword_matched} por palavras-chave, ${data.summary.ai_identified} por IA, ${data.summary.clusters_found} clusters). ${data.summary.videos_linked} vídeos vinculados.`
-      );
-      queryClient.invalidateQueries({ queryKey: ["trend-products"] });
-    } catch (err: any) {
-      toast.error("Erro na identificação: " + (err.message || "Erro desconhecido"));
-    } finally {
-      setIsIdentifying(false);
-    }
-  };
-
-  const handleCalculate = async () => {
-    setIsCalculating(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("calculate-trends");
-      if (error) throw error;
-      toast.success(
-        `Cálculo concluído! ${data.summary.products_updated} produtos atualizados: ${data.summary.hot_products} hot, ${data.summary.rising_products} rising, ${data.summary.saturated_products} saturados.`
-      );
-      queryClient.invalidateQueries({ queryKey: ["trend-products"] });
-    } catch (err: any) {
-      toast.error("Erro no cálculo: " + (err.message || "Erro desconhecido"));
-    } finally {
-      setIsCalculating(false);
+      setLoading(false);
     }
   };
 
@@ -110,44 +78,27 @@ const Dashboard = () => {
             </div>
             <span className="font-display text-xl font-bold">TrendPulse</span>
           </Link>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCalculate}
-              disabled={isCalculating}
-              className="gap-2"
-            >
-              <Calculator className={`h-4 w-4 ${isCalculating ? "animate-pulse" : ""}`} />
-              {isCalculating ? "Calculando..." : "Calcular Scores"}
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => handleAction("collect-trends", setIsCollecting)} disabled={isCollecting} className="gap-1.5">
+              <RefreshCw className={`h-3.5 w-3.5 ${isCollecting ? "animate-spin" : ""}`} />
+              <span className="hidden sm:inline">{isCollecting ? "Coletando..." : "Coletar"}</span>
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleIdentify}
-              disabled={isIdentifying}
-              className="gap-2"
-            >
-              <ScanSearch className={`h-4 w-4 ${isIdentifying ? "animate-pulse" : ""}`} />
-              {isIdentifying ? "Identificando..." : "Identificar"}
+            <Button variant="outline" size="sm" onClick={() => handleAction("identify-products", setIsIdentifying)} disabled={isIdentifying} className="gap-1.5">
+              <ScanSearch className={`h-3.5 w-3.5 ${isIdentifying ? "animate-pulse" : ""}`} />
+              <span className="hidden sm:inline">{isIdentifying ? "Identificando..." : "Identificar"}</span>
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCollect}
-              disabled={isCollecting}
-              className="gap-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${isCollecting ? "animate-spin" : ""}`} />
-              {isCollecting ? "Coletando..." : "Coletar"}
+            <Button variant="outline" size="sm" onClick={() => handleAction("calculate-trends", setIsCalculating)} disabled={isCalculating} className="gap-1.5">
+              <Calculator className={`h-3.5 w-3.5 ${isCalculating ? "animate-pulse" : ""}`} />
+              <span className="hidden sm:inline">{isCalculating ? "Calculando..." : "Calcular"}</span>
             </Button>
+            <ThemeToggle />
             {role === "admin" && (
               <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="text-muted-foreground">
                 Admin
               </Button>
             )}
             <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-1 text-muted-foreground">
-              <LogOut className="h-4 w-4" /> Sair
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -171,7 +122,7 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Hashtags Trending */}
+        {/* Hashtags */}
         {hashtags && hashtags.length > 0 && (
           <div className="mb-8">
             <h2 className="mb-3 flex items-center gap-2 font-display text-lg font-bold">
@@ -186,9 +137,7 @@ const Dashboard = () => {
                 >
                   <span className="font-medium">{ht.tag}</span>
                   <span className="text-xs text-muted-foreground">
-                    {ht.current_view_count
-                      ? `${(ht.current_view_count / 1000000).toFixed(1)}M views`
-                      : ""}
+                    {ht.current_view_count ? `${(ht.current_view_count / 1000000).toFixed(1)}M views` : ""}
                   </span>
                 </div>
               ))}
@@ -200,19 +149,12 @@ const Dashboard = () => {
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative max-w-sm flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Buscar produtos..."
-              className="pl-9"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+            <Input placeholder="Buscar produtos..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
           <div className="flex items-center gap-2">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
             {filters.map((f) => (
-              <Button key={f} variant="outline" size="sm" className="text-xs">
-                {f}
-              </Button>
+              <Button key={f} variant="outline" size="sm" className="text-xs">{f}</Button>
             ))}
           </div>
         </div>
@@ -236,11 +178,9 @@ const Dashboard = () => {
 
         {/* Title */}
         <div className="mb-6">
-          <h1 className="font-display text-2xl font-bold">
-            Produtos em Tendência
-          </h1>
+          <h1 className="font-display text-2xl font-bold">Produtos em Tendência</h1>
           <p className="text-sm text-muted-foreground">
-            {filtered.length} produtos encontrados • {hasDBData ? "Dados reais do banco" : "Dados de demonstração"} • Atualizado há 5 minutos
+            {filtered.length} produtos encontrados • {hasDBData ? "Dados reais" : "Dados de demonstração"}
           </p>
         </div>
 
@@ -254,12 +194,7 @@ const Dashboard = () => {
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((product, i) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-              >
+              <motion.div key={product.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                 <TrendCard product={product} />
               </motion.div>
             ))}
