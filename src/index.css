@@ -56,6 +56,11 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --chart-1: 225 73% 57%;
+    --chart-2: 270 60% 55%;
+    --chart-3: 30 95% 55%;
+    --chart-4: 160 60% 45%;
+    --chart-5: 0 84% 60%;
   }
 
   .dark {
