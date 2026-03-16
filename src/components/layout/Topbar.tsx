@@ -4,13 +4,17 @@ import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 
-const Topbar = () => {
+interface TopbarProps {
+  onMenuClick?: () => void;
+}
+
+const Topbar = ({ onMenuClick }: TopbarProps) => {
   const { user, role } = useAuth();
   
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md md:px-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="md:hidden">
+        <Button variant="ghost" size="icon" className="md:hidden" onClick={onMenuClick}>
           <Menu className="h-5 w-5" />
         </Button>
         <div className="hidden items-center md:flex">
@@ -28,7 +32,7 @@ const Topbar = () => {
       <div className="flex items-center gap-2 md:gap-4">
         {role === "admin" && (
           <span className="hidden rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary md:inline-flex">
-            Admin Area
+            Admin
           </span>
         )}
         <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
