@@ -166,6 +166,11 @@ export type Database = {
           full_name: string | null
           id: string
           updated_at: string
+          role: Database["public"]["Enums"]["subscription_plan"]
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          stripe_subscription_status: string | null
+          plan_expires_at: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -176,6 +181,11 @@ export type Database = {
           full_name?: string | null
           id: string
           updated_at?: string
+          role?: Database["public"]["Enums"]["subscription_plan"]
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          stripe_subscription_status?: string | null
+          plan_expires_at?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -186,6 +196,11 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+          role?: Database["public"]["Enums"]["subscription_plan"]
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          stripe_subscription_status?: string | null
+          plan_expires_at?: string | null
         }
         Relationships: []
       }
@@ -327,9 +342,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_user_subscription_role: { Args: Record<PropertyKey, never>; Returns: string }
+      is_pro_user: { Args: Record<PropertyKey, never>; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "client"
+      subscription_plan: "free" | "pro" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -458,6 +476,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "client"],
+      subscription_plan: ["free", "pro", "admin"],
     },
   },
 } as const

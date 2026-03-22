@@ -161,7 +161,34 @@
   }
 
   .glass {
-    @apply bg-background/70 backdrop-blur-md border-border/50 shadow-sm;
+    @apply bg-background/70 backdrop-blur-md border border-border/50 shadow-sm;
+  }
+
+  /* Futuristic glass panel — dark mode optimized */
+  .glass-panel {
+    background: hsl(var(--card) / 0.7);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid hsl(var(--border) / 0.6);
+    box-shadow: 0 4px 24px hsl(var(--primary) / 0.06), inset 0 0 0 1px hsl(var(--primary) / 0.04);
+  }
+
+  /* Neon glow ring — use as overlay on 3D containers */
+  .neon-glow {
+    box-shadow:
+      0 0 15px hsl(var(--primary) / 0.4),
+      0 0 40px hsl(var(--primary) / 0.2),
+      0 0 80px hsl(var(--primary) / 0.1);
+    border-radius: 9999px;
+  }
+
+  /* Data grid — subtle dot pattern for backgrounds */
+  .data-grid {
+    background-image:
+      radial-gradient(hsl(var(--primary) / 0.15) 1px, transparent 1px);
+    background-size: 28px 28px;
   }
 }
+
+
 

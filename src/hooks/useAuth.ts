@@ -1,45 +1,80 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
+
+type SubscriptionPlan = Database["public"]["Enums"]["subscription_plan"];
+
+interface AuthState {
+  user: User | null;
+  session: Session | null;
+  role: SubscriptionPlan | null;
+  isPro: boolean;
+  isAdmin: boolean;
+  stripeCustomerId: string | null;
+  stripeSubscriptionId: string | null;
+  loading: boolean;
+}
+
+async function fetchProfile(userId: string) {
+  const { data } = await supabase
+    .from("profiles")
+    .select("role, stripe_customer_id, stripe_subscription_id")
+    .eq("id", userId)
+    .single();
+  return data;
+}
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [role, setRole] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<AuthState>({
+    user: null,
+    session: null,
+    role: null,
+    isPro: false,
+    isAdmin: false,
+    stripeCustomerId: null,
+    stripeSubscriptionId: null,
+    loading: true,
+  });
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-
+        let profileData: { role: SubscriptionPlan; stripe_customer_id: string | null; stripe_subscription_id: string | null } | null = null;
         if (session?.user) {
-          // Fetch role using security definer function
-          const { data } = await supabase.rpc("get_user_role", {
-            _user_id: session.user.id,
-          });
-          setRole(data || "client");
-        } else {
-          setRole(null);
+          profileData = await fetchProfile(session.user.id) as typeof profileData;
         }
-        setLoading(false);
+
+        setState({
+          user: session?.user ?? null,
+          session,
+          role: profileData?.role ?? null,
+          isPro: profileData?.role === "pro" || profileData?.role === "admin",
+          isAdmin: profileData?.role === "admin",
+          stripeCustomerId: profileData?.stripe_customer_id ?? null,
+          stripeSubscriptionId: profileData?.stripe_subscription_id ?? null,
+          loading: false,
+        });
       }
     );
 
-    // THEN get initial session
+    // Initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-
+      let profileData: { role: SubscriptionPlan; stripe_customer_id: string | null; stripe_subscription_id: string | null } | null = null;
       if (session?.user) {
-        const { data } = await supabase.rpc("get_user_role", {
-          _user_id: session.user.id,
-        });
-        setRole(data || "client");
+        profileData = await fetchProfile(session.user.id) as typeof profileData;
       }
-      setLoading(false);
+
+      setState({
+        user: session?.user ?? null,
+        session,
+        role: profileData?.role ?? null,
+        isPro: profileData?.role === "pro" || profileData?.role === "admin",
+        isAdmin: profileData?.role === "admin",
+        stripeCustomerId: profileData?.stripe_customer_id ?? null,
+        stripeSubscriptionId: profileData?.stripe_subscription_id ?? null,
+        loading: false,
+      });
     });
 
     return () => subscription.unsubscribe();
@@ -47,10 +82,17 @@ export function useAuth() {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setRole(null);
+    setState({
+      user: null,
+      session: null,
+      role: null,
+      isPro: false,
+      isAdmin: false,
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      loading: false,
+    });
   };
 
-  return { user, session, role, loading, signOut };
+  return { ...state, signOut };
 }
