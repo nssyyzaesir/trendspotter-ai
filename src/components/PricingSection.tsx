@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, Zap, Crown, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useCheckout } from "@/hooks/useCheckout";
+import { useAuth } from "@/hooks/useAuth";
+
 
 const plans = [
   {
@@ -56,10 +60,10 @@ const periods = [
   { key: "yearly" as const, label: "Anual", save: "30%" },
 ];
 
-import { useState } from "react";
-
 const PricingSection = () => {
   const [period, setPeriod] = useState<"monthly" | "quarterly" | "yearly">("monthly");
+  const { startCheckout, loading } = useCheckout();
+  const { user } = useAuth();
 
   return (
     <section id="pricing" className="relative py-24 bg-muted/20">
@@ -154,18 +158,34 @@ const PricingSection = () => {
                   </span>
                 </div>
 
-                <Link to="/auth" className="block w-full">
-                  <Button
-                    size="lg"
-                    className={`w-full rounded-xl h-12 text-base font-semibold ${
-                      plan.popular
-                        ? "bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"
-                        : "bg-muted text-foreground hover:bg-muted/80"
-                    }`}
-                  >
-                    Começar Agora
-                  </Button>
-                </Link>
+                {plan.popular ? (
+                  user ? (
+                    <Button
+                      size="lg"
+                      id={`pricing-plan-${plan.name.toLowerCase()}`}
+                      className="w-full rounded-xl h-12 text-base font-semibold bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"
+                      onClick={startCheckout}
+                      disabled={loading}
+                    >
+                      {loading ? "Redirecionando..." : "Assinar Agora"}
+                    </Button>
+                  ) : (
+                    <Link to="/auth" className="block w-full">
+                      <Button size="lg" className="w-full rounded-xl h-12 text-base font-semibold bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+                        Começar Agora
+                      </Button>
+                    </Link>
+                  )
+                ) : (
+                  <Link to="/auth" className="block w-full">
+                    <Button
+                      size="lg"
+                      className={`w-full rounded-xl h-12 text-base font-semibold bg-muted text-foreground hover:bg-muted/80`}
+                    >
+                      Começar Agora
+                    </Button>
+                  </Link>
+                )}
               </div>
 
               <div className="flex-1 bg-muted/20 p-8 pt-6 border-t border-border/50">
