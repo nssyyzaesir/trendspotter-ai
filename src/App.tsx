@@ -14,6 +14,7 @@ import Favorites from "./pages/Favorites";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Pricing from "./pages/Pricing";
+import MockCheckout from "./pages/MockCheckout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/checkout" element={<ProtectedRoute><MockCheckout /></ProtectedRoute>} />
           <Route path="/success" element={<Navigate to="/dashboard?checkout=success" replace />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/trends" element={<ProtectedRoute><Trends /></ProtectedRoute>} />

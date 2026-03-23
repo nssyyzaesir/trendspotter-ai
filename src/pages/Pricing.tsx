@@ -2,9 +2,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, Zap, Star, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCheckout } from "@/hooks/useCheckout";
 import { useAuth } from "@/hooks/useAuth";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const FREE_FEATURES = [
   "5 produtos rastreados",
@@ -27,8 +26,8 @@ const PRO_FEATURES = [
 
 const Pricing = () => {
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
-  const { startCheckout, loading } = useCheckout();
   const { user, isPro } = useAuth();
+  const navigate = useNavigate();
 
   const monthlyPrice = 29;
   const annualPrice = Math.round(monthlyPrice * 0.75); // 25% desconto
@@ -176,12 +175,12 @@ const Pricing = () => {
             ) : (
               <Button
                 className="w-full bg-gradient-primary gap-2 hover:opacity-90 transition-opacity"
-                onClick={startCheckout}
-                disabled={loading || !user}
+                onClick={() => navigate(user ? "/checkout" : "/auth")}
+                disabled={!user}
                 id="upgrade-pro-btn"
               >
                 <Zap className="h-4 w-4" />
-                {loading ? "Redirecionando..." : user ? "Assinar Pro" : "Criar conta primeiro"}
+                {user ? "Assinar Pro" : "Criar conta primeiro"}
               </Button>
             )}
 

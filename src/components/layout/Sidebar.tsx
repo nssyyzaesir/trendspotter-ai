@@ -39,8 +39,8 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
       )}
 
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-64 flex-col border-r border-border bg-card transition-transform duration-300 md:z-40 md:flex md:translate-x-0 ${
-          open ? "flex translate-x-0" : "hidden -translate-x-full md:flex md:translate-x-0"
+        className={`fixed left-0 top-0 z-50 h-screen w-64 flex-col border-r border-border bg-card transition-transform duration-300 md:z-40 flex md:translate-x-0 ${
+          open ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
         <div className="flex h-16 items-center gap-2 border-b border-border px-6">
