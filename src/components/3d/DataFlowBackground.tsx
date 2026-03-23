@@ -30,11 +30,11 @@ function Particles() {
       <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
         <PointMaterial
           transparent
-          color="#8b5cf6" // primary-ish color
-          size={0.06}
+          color="#8b5cf6"
+          size={0.2} 
           sizeAttenuation={true}
           depthWrite={false}
-          opacity={0.3} // Very subtle
+          opacity={0.8}
         />
       </Points>
     </group>

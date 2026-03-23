@@ -161,8 +161,9 @@ const Trends = () => {
         </div>
       ) : viewMode === "table" ? (
         /* TABLE VIEW */
-        <div className="glass-panel overflow-hidden rounded-2xl">
-          <table className="w-full text-sm">
+        <div className="glass-panel rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[800px]">
             <thead>
               <tr className="border-b border-border/60">
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground w-8">#</th>
@@ -246,6 +247,7 @@ const Trends = () => {
               <p className="mt-1 text-sm text-muted-foreground">Ajuste os filtros acima</p>
             </div>
           )}
+          </div>
         </div>
       ) : (
         /* GRID VIEW */
