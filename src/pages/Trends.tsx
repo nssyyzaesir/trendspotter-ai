@@ -251,7 +251,7 @@ const Trends = () => {
         </div>
       ) : (
         /* GRID VIEW */
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
           {filtered.map((product, i) => (
             <motion.div
               key={product.id}
@@ -259,7 +259,7 @@ const Trends = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.04 }}
               onClick={() => setSelectedProduct(product)}
-              className="glass-panel cursor-pointer rounded-2xl p-4 hover:-translate-y-1 transition-all group"
+              className="glass-panel cursor-pointer rounded-2xl p-4 hover:scale-[1.02] hover:shadow-card-hover hover:border-primary/50 transition-all duration-500 group break-inside-avoid mb-5 bg-opacity-80 backdrop-blur-sm"
             >
               <div className="flex items-start gap-3 mb-3">
                 <img src={product.image} alt={product.name} className="h-12 w-12 rounded-xl object-cover border border-border/50" />

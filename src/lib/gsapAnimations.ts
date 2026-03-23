@@ -9,7 +9,12 @@ let gsapInstance: typeof import("gsap").gsap | null = null;
 
 async function getGsap() {
   if (gsapInstance) return gsapInstance;
-  const { gsap } = await import("gsap");
+  const [{ gsap }, { ScrollTrigger }] = await Promise.all([
+    import("gsap"),
+    import("gsap/ScrollTrigger")
+  ]);
+  
+  gsap.registerPlugin(ScrollTrigger);
   gsapInstance = gsap;
 
   // Pausar/retomar animações com visibilidade do documento
@@ -37,19 +42,25 @@ export async function animateCardEntry(
   const validElements = elements.filter(Boolean) as HTMLElement[];
   if (!validElements.length) return;
 
-  gsap.fromTo(
-    validElements,
-    { opacity: 0, y: 24, scale: 0.97 },
-    {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      duration: 0.5,
-      ease: "power3.out",
-      stagger: 0.07,
-      delay,
-    }
-  );
+  validElements.forEach((el, i) => {
+    gsap.fromTo(
+      el,
+      { opacity: 0, y: 40, scale: 0.95 },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.6,
+        ease: "power3.out",
+        delay: delay + (i % 4) * 0.1, // Simulate masonry stagger per row
+        scrollTrigger: {
+          trigger: el,
+          start: "top 90%",
+          toggleActions: "play none none reverse"
+        }
+      }
+    );
+  });
 }
 
 /**
@@ -73,6 +84,11 @@ export async function animateCountUp(
     value: targetValue,
     duration,
     ease: "power2.out",
+    scrollTrigger: {
+      trigger: element,
+      start: "top 95%",
+      toggleActions: "play none none none"
+    },
     onUpdate() {
       element.textContent = Math.round(counter.value).toLocaleString("pt-BR") + suffix;
     },

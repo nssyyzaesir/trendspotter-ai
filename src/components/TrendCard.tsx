@@ -16,7 +16,7 @@ export interface TrendProduct {
 
 const TrendCard = ({ product }: { product: TrendProduct }) => {
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover hover:border-border/80">
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition-all duration-500 hover:scale-[1.02] hover:shadow-card-hover hover:border-primary/50 hover:z-10 bg-opacity-80 backdrop-blur-sm">
       {/* Top Section */}
       <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-3">

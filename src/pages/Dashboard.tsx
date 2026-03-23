@@ -224,19 +224,19 @@ const Dashboard = () => {
 
         {/* Grid */}
         {productsLoading ? (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-72 animate-pulse rounded-2xl bg-muted/60" />
+              <div key={i} className="h-72 animate-pulse rounded-2xl bg-muted/60 mb-5 break-inside-avoid" />
             ))}
           </div>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
             {filtered.map((product, i) => (
               <div
                 key={product.id}
                 ref={(el) => { cardRefs.current[stats.length + i] = el; }}
                 onClick={() => setSelectedProduct(product)}
-                className="cursor-pointer"
+                className="cursor-pointer break-inside-avoid mb-5"
               >
                 <TrendCard product={product} />
               </div>

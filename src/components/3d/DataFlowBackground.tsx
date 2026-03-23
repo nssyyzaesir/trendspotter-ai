@@ -4,37 +4,46 @@ import { Points, PointMaterial } from "@react-three/drei";
 import * as THREE from "three";
 
 function Particles() {
-  const ref = useRef<THREE.Points>(null);
+  const pointsRef = useRef<THREE.Points>(null);
+  const groupRef = useRef<THREE.Group>(null);
   
   // Create random points for a light "data flow" feel
   const [positions] = useMemo(() => {
-    const count = 300; // Low count constraints for performance
+    const count = 400; // Low count constraints for performance
     const positions = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 15;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 15;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 15;
+      positions[i * 3] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
     }
     return [positions];
   }, []);
 
   useFrame((state, delta) => {
-    if (ref.current) {
-      ref.current.rotation.x -= delta / 25;
-      ref.current.rotation.y -= delta / 35;
+    if (pointsRef.current) {
+      pointsRef.current.rotation.x -= delta / 30;
+      pointsRef.current.rotation.y -= delta / 40;
+    }
+    if (groupRef.current) {
+      // Gentle parallax
+      const targetX = (state.mouse.y * Math.PI) / 8;
+      const targetY = (state.mouse.x * Math.PI) / 8;
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetX, 0.05);
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetY, 0.05);
     }
   });
 
   return (
-    <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
+    <group ref={groupRef} rotation={[0, 0, Math.PI / 4]}>
+      <Points ref={pointsRef} positions={positions} stride={3} frustumCulled={false}>
         <PointMaterial
           transparent
-          color="#8b5cf6"
-          size={0.2} 
+          color="#00f0ff"
+          size={0.12} 
           sizeAttenuation={true}
           depthWrite={false}
-          opacity={0.8}
+          opacity={0.6}
+          blending={THREE.AdditiveBlending}
         />
       </Points>
     </group>
