@@ -1,176 +1,160 @@
-/**
- * @module gsapAnimations
- * Funções de animação GSAP reutilizáveis para o FluxMetric Dashboard.
- * Todas as animações pausam quando a aba fica inativa (visibilitychange).
- */
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Lazy import para evitar SSR issues
-let gsapInstance: typeof import("gsap").gsap | null = null;
-
-async function getGsap() {
-  if (gsapInstance) return gsapInstance;
-  const [{ gsap }, { ScrollTrigger }] = await Promise.all([
-    import("gsap"),
-    import("gsap/ScrollTrigger")
-  ]);
-  
-  gsap.registerPlugin(ScrollTrigger);
-  gsapInstance = gsap;
-
-  // Pausar/retomar animações com visibilidade do documento
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      gsap.globalTimeline.pause();
-    } else {
-      gsap.globalTimeline.resume();
-    }
-  });
-
-  return gsap;
-}
+gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Anima cards com entrada em stagger (cascata de baixo para cima).
- * @param elements - Array de elementos ou ref HTMLElement[]
- * @param delay - Delay inicial antes de iniciar (default: 0)
+ * Text reveal animation using clip-path (word by word).
+ * Wraps each word in a span with overflow:hidden for cinema-style reveal.
  */
-export async function animateCardEntry(
-  elements: (HTMLElement | null)[],
-  delay = 0
-): Promise<void> {
-  const gsap = await getGsap();
-  const validElements = elements.filter(Boolean) as HTMLElement[];
-  if (!validElements.length) return;
-
-  validElements.forEach((el, i) => {
-    gsap.fromTo(
-      el,
-      { opacity: 0, y: 40, scale: 0.95 },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.6,
-        ease: "power3.out",
-        delay: delay + (i % 4) * 0.1, // Simulate masonry stagger per row
-        scrollTrigger: {
-          trigger: el,
-          start: "top 90%",
-          toggleActions: "play none none reverse"
-        }
-      }
-    );
-  });
-}
-
-/**
- * Anima um contador numérico de 0 até o valor alvo.
- * @param element - Elemento HTML onde o número será exibido
- * @param targetValue - Valor final do contador
- * @param duration - Duração da animação em segundos (default: 1.5)
- * @param suffix - Sufixo para exibir após o número (ex: "%", "k")
- */
-export async function animateCountUp(
-  element: HTMLElement | null,
-  targetValue: number,
-  duration = 1.5,
-  suffix = ""
-): Promise<void> {
+export function animateTextReveal(element: HTMLElement | null, delay = 0) {
   if (!element) return;
-  const gsap = await getGsap();
 
-  const counter = { value: 0 };
-  gsap.to(counter, {
-    value: targetValue,
-    duration,
-    ease: "power2.out",
-    scrollTrigger: {
-      trigger: element,
-      start: "top 95%",
-      toggleActions: "play none none none"
-    },
-    onUpdate() {
-      element.textContent = Math.round(counter.value).toLocaleString("pt-BR") + suffix;
-    },
-  });
-}
+  const originalText = element.textContent || "";
+  const words = originalText.split(" ");
 
-/**
- * Anima uma barra de progresso crescendo para a largura alvo.
- * @param element - Elemento da barra (deve ter display:block)
- * @param percentage - Percentagem alvo (0-100)
- * @param duration - Duração em segundos (default: 0.8)
- */
-export async function animateBarGrow(
-  element: HTMLElement | null,
-  percentage: number,
-  duration = 0.8
-): Promise<void> {
-  if (!element) return;
-  const gsap = await getGsap();
+  element.innerHTML = words
+    .map(
+      (word) =>
+        `<span class="inline-block overflow-hidden"><span class="inline-block">${word}&nbsp;</span></span>`
+    )
+    .join("");
+
+  const spans = element.querySelectorAll("span > span");
 
   gsap.fromTo(
-    element,
-    { width: "0%" },
+    spans,
+    { y: "110%", opacity: 0 },
     {
-      width: `${Math.min(100, Math.max(0, percentage))}%`,
-      duration,
+      y: "0%",
+      opacity: 1,
+      duration: 0.9,
+      delay,
+      stagger: 0.06,
+      ease: "power4.out",
+    }
+  );
+}
+
+/**
+ * Card entry animation with clip-path reveal.
+ */
+export function animateCardEntry(
+  elements: (HTMLElement | null)[],
+  delay = 0
+) {
+  const valid = elements.filter(Boolean) as HTMLElement[];
+  if (!valid.length) return;
+
+  gsap.fromTo(
+    valid,
+    { y: 40, opacity: 0, clipPath: "inset(0 0 24px 0)" },
+    {
+      y: 0,
+      opacity: 1,
+      clipPath: "inset(0 0 0px 0)",
+      duration: 0.8,
+      delay,
+      stagger: 0.1,
       ease: "power3.out",
     }
   );
 }
 
 /**
- * Animação de entrada de texto (simula SplitText com spans).
- * @param element - Elemento de texto
- * @param delay - Delay inicial
+ * ScrollTrigger card reveal — use on grid containers.
  */
-export async function animateTextReveal(
-  element: HTMLElement | null,
-  delay = 0
-): Promise<void> {
-  if (!element) return;
-  const gsap = await getGsap();
+export function animateScrollCards(container: HTMLElement | null, selector = ".card-reveal") {
+  if (!container) return;
+  const cards = container.querySelectorAll(selector);
+  if (!cards.length) return;
 
-  const text = element.textContent ?? "";
-  element.innerHTML = text
-    .split("")
-    .map((char) => `<span style="display:inline-block">${char === " " ? "&nbsp;" : char}</span>`)
-    .join("");
-
-  const spans = element.querySelectorAll("span");
   gsap.fromTo(
-    spans,
-    { opacity: 0, y: 20, rotationX: -30 },
+    cards,
+    { y: 48, opacity: 0 },
     {
-      opacity: 1,
       y: 0,
-      rotationX: 0,
-      duration: 0.04,
-      stagger: 0.03,
-      ease: "power2.out",
-      delay,
+      opacity: 1,
+      duration: 0.7,
+      stagger: 0.08,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: container,
+        start: "top 80%",
+        once: true,
+      },
     }
   );
 }
 
 /**
- * Animação de glow pulsante em um elemento.
- * @param element - Elemento alvo
- * @param color - Cor do glow em hex (default: primary blue)
+ * Animated number counter (CountUp effect) on scroll.
  */
-export async function animateGlowPulse(
-  element: HTMLElement | null,
-  color = "#4f87ff"
-): Promise<void> {
-  if (!element) return;
-  const gsap = await getGsap();
+export function animateCountUp(
+  el: HTMLElement | null,
+  target: number,
+  suffix = "",
+  prefix = ""
+) {
+  if (!el) return;
+  const obj = { val: 0 };
 
-  gsap.to(element, {
-    boxShadow: `0 0 30px ${color}80, 0 0 60px ${color}40`,
-    duration: 1.2,
-    repeat: -1,
-    yoyo: true,
-    ease: "sine.inOut",
+  gsap.to(obj, {
+    val: target,
+    duration: 1.8,
+    ease: "power2.out",
+    onUpdate: () => {
+      el.textContent = prefix + Math.round(obj.val).toLocaleString() + suffix;
+    },
+    scrollTrigger: {
+      trigger: el,
+      start: "top 90%",
+      once: true,
+    },
+  });
+}
+
+/**
+ * Section fade-up reveal via ScrollTrigger.
+ */
+export function animateSectionEntry(
+  el: HTMLElement | null,
+  options?: { delay?: number; y?: number; duration?: number }
+) {
+  if (!el) return;
+  const { delay = 0, y = 40, duration = 0.9 } = options ?? {};
+
+  gsap.fromTo(
+    el,
+    { y, opacity: 0 },
+    {
+      y: 0,
+      opacity: 1,
+      duration,
+      delay,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: el,
+        start: "top 85%",
+        once: true,
+      },
+    }
+  );
+}
+
+/**
+ * SVG path draw animation (for timeline connector lines).
+ */
+export function animateSvgDraw(path: SVGPathElement | null, delay = 0) {
+  if (!path) return;
+  const length = path.getTotalLength();
+
+  gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+  gsap.to(path, {
+    strokeDashoffset: 0,
+    duration: 1.5,
+    delay,
+    ease: "power2.out",
+    scrollTrigger: { trigger: path, start: "top 80%", once: true },
   });
 }

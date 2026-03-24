@@ -1,209 +1,216 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Check, Zap, Crown, Rocket } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Check, Zap, Star, Shield, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { useCheckout } from "@/hooks/useCheckout";
 import { useAuth } from "@/hooks/useAuth";
+import { useCheckout } from "@/hooks/useCheckout";
+import { Link, useNavigate } from "react-router-dom";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+gsap.registerPlugin(ScrollTrigger);
 
-const plans = [
-  {
-    name: "Starter",
-    icon: Zap,
-    price: { monthly: 29, quarterly: 79, yearly: 249 },
-    description: "Perfeito para iniciantes",
-    features: [
-      "Até 50 produtos monitorados",
-      "Atualizações diárias",
-      "Relatórios básicos",
-      "Suporte por email",
-    ],
-    popular: false,
-  },
-  {
-    name: "Pro",
-    icon: Crown,
-    price: { monthly: 79, quarterly: 199, yearly: 699 },
-    description: "Para vendedores sérios",
-    features: [
-      "Até 500 produtos monitorados",
-      "Atualizações em tempo real",
-      "Relatórios avançados com IA",
-      "Alertas de tendência",
-      "Análise de concorrência",
-      "Suporte prioritário",
-    ],
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    icon: Rocket,
-    price: { monthly: 199, quarterly: 499, yearly: 1799 },
-    description: "Para equipes e agências",
-    features: [
-      "Produtos ilimitados",
-      "API completa",
-      "Relatórios white-label",
-      "Múltiplos usuários",
-      "Webhooks personalizados",
-      "Gerente de conta dedicado",
-      "SLA garantido",
-    ],
-    popular: false,
-  },
+const FREE_FEATURES = [
+  "5 produtos rastreados",
+  "Dados de 7 dias",
+  "Dashboard básico",
+  "Atualização diária",
+  "Suporte por email",
 ];
 
-const periods = [
-  { key: "monthly" as const, label: "Mensal" },
-  { key: "quarterly" as const, label: "Trimestral", save: "10%" },
-  { key: "yearly" as const, label: "Anual", save: "30%" },
+const PRO_FEATURES = [
+  "Produtos ilimitados",
+  "Dados de 90 dias",
+  "Dashboard 3D em tempo real",
+  "TrendScore™ avançado",
+  "Alertas instantâneos",
+  "Exportar relatórios",
+  "Atualização a cada hora",
+  "Suporte prioritário",
 ];
 
 const PricingSection = () => {
-  const [period, setPeriod] = useState<"monthly" | "quarterly" | "yearly">("monthly");
+  const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
+  const { user, isPro } = useAuth();
   const { startCheckout, loading } = useCheckout();
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const monthlyPrice = 29;
+  const annualPrice = Math.round(monthlyPrice * 0.75);
+  const price = billing === "annual" ? annualPrice : monthlyPrice;
+
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const cards = sectionRef.current.querySelectorAll(".pricing-card");
+    gsap.fromTo(
+      cards,
+      { y: 60, opacity: 0 },
+      {
+        y: 0, opacity: 1, duration: 0.9, stagger: 0.2, ease: "power3.out",
+        scrollTrigger: { trigger: sectionRef.current, start: "top 78%", once: true },
+      }
+    );
+  }, []);
+
+  const handleUpgrade = () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    startCheckout();
+  };
 
   return (
-    <section id="pricing" className="relative py-24 bg-muted/20">
-      <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-16 text-center"
-        >
-          <div className="mb-4 inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
-            Planos e Preços
-          </div>
-          <h2 className="mb-4 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Invista no seu <span className="text-gradient">crescimento</span>
-          </h2>
-          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-            Escolha o plano ideal e comece a identificar produtos virais antes da concorrência, multiplicando suas vendas.
-          </p>
-        </motion.div>
+    <section ref={sectionRef} id="pricing" className="relative py-section overflow-hidden">
+      <div className="absolute inset-0 dot-grid opacity-15" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-2/3 bg-gradient-to-r from-transparent via-border to-transparent" />
 
-        {/* Period Selector Toggle */}
-        <div className="mb-12 flex justify-center">
-          <div className="inline-flex items-center rounded-full border border-border/50 bg-card p-1.5 shadow-sm">
-            {periods.map((p) => (
+      <div className="container relative z-10 mx-auto px-4">
+        {/* Header */}
+        <div className="mb-16 text-center">
+          <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-secondary/25 bg-secondary/8 px-4 py-1.5 text-sm font-semibold text-secondary">
+            <Zap className="h-3.5 w-3.5" />
+            Simples e transparente
+          </div>
+          <h2 className="font-display text-4xl font-bold tracking-tight sm:text-5xl">
+            Escolha o plano certo para{" "}
+            <span className="text-gradient block sm:inline">seu negócio</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-lg text-lg text-muted-foreground">
+            Comece gratuitamente. Faça upgrade quando precisar de mais poder.
+          </p>
+
+          {/* Billing toggle */}
+          <div className="mt-8 inline-flex items-center rounded-2xl border border-border/50 bg-surface-1 p-1.5 gap-1">
+            {(["monthly", "annual"] as const).map((b) => (
               <button
-                key={p.key}
-                onClick={() => setPeriod(p.key)}
-                className={`relative flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-300 ${
-                  period === p.key
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                key={b}
+                onClick={() => setBilling(b)}
+                className={`rounded-xl px-6 py-2 text-sm font-semibold transition-all duration-300 ${
+                  billing === b
+                    ? "bg-gradient-primary text-background shadow-glow"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {p.label}
-                {p.save && (
-                  <span
-                    className={`ml-2 rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wider ${
-                      period === p.key
-                        ? "bg-primary-foreground/20 text-primary-foreground"
-                        : "bg-accent/20 text-accent"
-                    }`}
-                  >
-                    -{p.save}
-                  </span>
+                {b === "monthly" ? "Mensal" : (
+                  <>Anual <span className="ml-1 text-[10px] font-bold text-green-400">-25%</span></>
                 )}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3 lg:gap-12">
-          {plans.map((plan, i) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className={`relative flex flex-col overflow-hidden rounded-3xl border ${
-                plan.popular
-                  ? "border-primary/50 bg-card shadow-xl shadow-primary/10 md:-mt-8 md:mb-8"
-                  : "border-border/50 bg-card shadow-sm mt-0"
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute top-0 flex w-full justify-center bg-gradient-primary py-1.5 text-xs font-bold uppercase tracking-widest text-primary-foreground">
-                  O Mais Escolhido
-                </div>
+        {/* Cards */}
+        <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2">
+          {/* Free */}
+          <div className="pricing-card glass-panel rounded-3xl p-8 relative overflow-hidden">
+            <div className="mb-7">
+              <h3 className="font-display text-2xl font-bold">Grátis</h3>
+              <p className="mt-1 text-sm text-muted-foreground">Para começar a explorar tendências</p>
+              <div className="mt-5 flex items-baseline gap-1">
+                <span className="font-display text-5xl font-bold">€0</span>
+                <span className="text-muted-foreground">/mês</span>
+              </div>
+            </div>
+            <ul className="mb-8 space-y-3.5">
+              {FREE_FEATURES.map((feat) => (
+                <li key={feat} className="flex items-center gap-3 text-sm">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted">
+                    <Check className="h-3 w-3 text-muted-foreground" />
+                  </span>
+                  <span className="text-muted-foreground">{feat}</span>
+                </li>
+              ))}
+            </ul>
+            {user ? (
+              <Button variant="outline" className="w-full rounded-xl border-border/50" asChild>
+                <Link to="/dashboard">Entrar no Dashboard</Link>
+              </Button>
+            ) : (
+              <Button variant="outline" className="w-full rounded-xl border-border/50" asChild>
+                <Link to="/auth">Começar Grátis</Link>
+              </Button>
+            )}
+          </div>
+
+          {/* Pro */}
+          <div className="pricing-card relative rounded-3xl p-8 overflow-hidden border-gradient">
+            {/* Orbital glow */}
+            <div className="absolute -top-12 -right-12 h-48 w-48 rounded-full bg-primary/20 blur-[60px]" />
+            <div className="absolute -bottom-12 -left-12 h-48 w-48 rounded-full bg-accent/15 blur-[60px]" />
+
+            {/* Popular badge */}
+            <div className="absolute top-6 right-6 flex items-center gap-1.5 rounded-full bg-gradient-primary px-3 py-1 text-[10px] font-bold text-background uppercase tracking-widest">
+              <Star className="h-2.5 w-2.5 fill-current" />
+              Popular
+            </div>
+
+            <div className="relative z-10 mb-7">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-display text-2xl font-bold">Pro</h3>
+                <Zap className="h-4 w-4 text-primary fill-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Para quem quer dominar o mercado</p>
+              <div className="mt-5 flex items-baseline gap-1">
+                <span className="font-display text-5xl font-bold text-gradient">€{price}</span>
+                <span className="text-muted-foreground">/mês</span>
+              </div>
+              {billing === "annual" && (
+                <p className="mt-1.5 text-xs text-muted-foreground">
+                  Cobrado anualmente (€{price * 12}/ano) · Economize €{(monthlyPrice - price) * 12}
+                </p>
               )}
-              
-              <div className={`p-8 ${plan.popular ? "pt-12" : ""}`}>
-                <div className="mb-6 flex items-center gap-4">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${
-                    plan.popular ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
-                  }`}>
-                    <plan.icon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-display text-2xl font-bold">{plan.name}</h3>
-                    <p className="text-sm text-muted-foreground">{plan.description}</p>
-                  </div>
-                </div>
+            </div>
 
-                <div className="mb-8 flex items-end gap-2">
-                  <span className="font-display text-5xl font-extrabold tracking-tight">
-                    R${plan.price[period]}
+            <ul className="relative z-10 mb-8 space-y-3.5">
+              {PRO_FEATURES.map((feat) => (
+                <li key={feat} className="flex items-center gap-3 text-sm">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/15">
+                    <Check className="h-3 w-3 text-primary" />
                   </span>
-                  <span className="mb-1 text-sm font-medium text-muted-foreground">
-                    /{period === "monthly" ? "mês" : period === "quarterly" ? "trimestre" : "ano"}
+                  <span>{feat}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="relative z-10">
+              {isPro ? (
+                <Button className="w-full bg-gradient-primary gap-2 rounded-xl h-12 font-bold" disabled>
+                  <Shield className="h-4 w-4" /> Você já é Pro!
+                </Button>
+              ) : (
+                <Button
+                  className="w-full bg-gradient-primary gap-2 rounded-xl h-12 font-bold hover:opacity-85 transition-all relative overflow-hidden group shadow-glow"
+                  onClick={handleUpgrade}
+                  disabled={loading}
+                  id="upgrade-pro-btn"
+                >
+                  <div className="absolute inset-0 shimmer opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="relative z-10 flex items-center gap-2">
+                    {loading ? (
+                      <><Loader2 className="h-4 w-4 animate-spin" /> Redirecionando...</>
+                    ) : (
+                      <><Zap className="h-4 w-4 fill-current" /> {user ? "Assinar Pro — €" + price + "/mês" : "Criar conta e assinar"}</>
+                    )}
                   </span>
-                </div>
+                </Button>
+              )}
+              {!user && (
+                <p className="mt-3 text-center text-xs text-muted-foreground">
+                  <Link to="/auth" className="text-primary hover:underline">Crie uma conta</Link> para fazer upgrade
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
 
-                {plan.popular ? (
-                  user ? (
-                    <Button
-                      size="lg"
-                      id={`pricing-plan-${plan.name.toLowerCase()}`}
-                      className="w-full rounded-xl h-12 text-base font-semibold bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"
-                      onClick={startCheckout}
-                      disabled={loading}
-                    >
-                      {loading ? "Redirecionando..." : "Assinar Agora"}
-                    </Button>
-                  ) : (
-                    <Link to="/auth" className="block w-full">
-                      <Button size="lg" className="w-full rounded-xl h-12 text-base font-semibold bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-                        Começar Agora
-                      </Button>
-                    </Link>
-                  )
-                ) : (
-                  <Link to="/auth" className="block w-full">
-                    <Button
-                      size="lg"
-                      className={`w-full rounded-xl h-12 text-base font-semibold bg-muted text-foreground hover:bg-muted/80`}
-                    >
-                      Começar Agora
-                    </Button>
-                  </Link>
-                )}
-              </div>
-
-              <div className="flex-1 bg-muted/20 p-8 pt-6 border-t border-border/50">
-                <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">O que está incluído:</p>
-                <ul className="space-y-4">
-                  {plan.features.map((f, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-sm font-medium">
-                      <div className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                        plan.popular ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
-                      }`}>
-                        <Check className="h-3 w-3" />
-                      </div>
-                      <span className="leading-tight">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </motion.div>
+        {/* Trust badges */}
+        <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+          {["Pagamento seguro via Stripe", "Cancele a qualquer momento", "Suporte 24/7", "Garantia 14 dias"].map((item) => (
+            <div key={item} className="flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5 text-primary" />
+              {item}
+            </div>
           ))}
         </div>
       </div>
